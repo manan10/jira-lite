@@ -1,73 +1,83 @@
-# React + TypeScript + Vite
+# 📋 Jira-Lite Dashboard (Task Manager)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A robust, Kanban-style task management application built with **React**, **TypeScript**, and **Tailwind CSS**. This dashboard features a fully functional drag-and-drop workflow simulation, complex filtering, real-time analytics, and local persistence.
 
-Currently, two official plugins are available:
+![Project Screenshot](https://via.placeholder.com/800x400?text=Dashboard+Screenshot+Placeholder)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## React Compiler
+### Core Functionality
+* **Kanban Workflow:** Four distinct columns (To Do, In Progress, Review, Done) with sequential task movement.
+* **CRUD Operations:** Create, Read, Update, and Delete tasks with a unified modal interface.
+* **Business Logic Enforcement:** Constraints prevent "Low Priority" (P2) tasks from being moved to the "Done" column directly, enforcing quality control simulation.
+* **Smart Forms:** Pre-filled edit forms that reuse logic for creating new tasks.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Advanced Features
+* **Compound Filtering:** Filter tasks by **Search Query** (Title) AND **Priority** simultaneously.
+* **Real-time Analytics:** Derived state calculations for Total Tasks, Pending Reviews, Completed Work, and Overdue Items.
+* **Audit Logging:** Tracks user actions (Create, Move, Delete) and displays the last 3 activities in a live log.
+* **Persistence:** Uses `localStorage` with lazy initialization to persist data across browser sessions.
+* **Visual Indicators:** Dynamic styling for Overdue dates (Red) and Priority badges (P0/P1/P2 colors).
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* **Framework:** [React](https://react.dev/) (Vite)
+* **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+* **Icons:** [Lucide React](https://lucide.dev/)
+* **State Management:** React `useState` & `useMemo` (No external libraries like Redux/Zustand used)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📦 Installation & Setup
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/yourusername/task-manager.git](https://github.com/yourusername/task-manager.git)
+    cd task-manager
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+3.  **Run the development server**
+    ```bash
+    npm run dev
+    ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+4.  **Build for production**
+    ```bash
+    npm run build
+    ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📂 Project Structure
+
+```bash
+src/
+├── components/         # Reusable UI components
+│   ├── StatsCard.tsx   # Top dashboard metrics
+│   ├── TaskCard.tsx    # Individual task item
+│   ├── TaskColumn.tsx  # Kanban lane
+│   └── TaskModal.tsx   # Form for Add/Edit
+├── types/
+│   └── types.ts        # TypeScript interfaces and enums
+├── App.tsx             # Main Layout & Business Logic
+└── main.tsx            # Entry point
+
+## 🧠 Technical Highlights
+
+* **Optimized Performance:** Utilized `useMemo` for filtering logic to prevent unnecessary recalculations on every render.
+* **Derived State:** Dashboard statistics are calculated on-the-fly using `Array.reduce()`, ensuring the "Stats" section is always perfectly in sync with the Task list without needing redundant state variables.
+* **Type Safety:** Fully typed interfaces for `Task`, `Priority`, and `Status` using TypeScript's `as const` pattern for robust enum-like behavior.
+* **Uncontrolled Components:** Utilized `defaultValue` and `key` prop patterns in forms to handle "Edit Mode" state resets effectively.
+
+## 🔮 Future Improvements
+
+* Implement Drag-and-Drop using `dnd-kit` or `react-beautiful-dnd`.
+* Add Dark Mode support via Tailwind.
+* Migrate `localStorage` to a real Backend API (Node/Express).
+* Add "Archive" functionality for cleaning up the Done column.
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
