@@ -64,6 +64,8 @@ src/
 ├── App.tsx             # Main Layout & Business Logic
 └── main.tsx            # Entry point
 
+```
+
 ## 🧠 Technical Highlights
 
 * **Optimized Performance:** Utilized `useMemo` for filtering logic to prevent unnecessary recalculations on every render.
