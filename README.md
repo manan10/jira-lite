@@ -2,7 +2,7 @@
 
 A robust, Kanban-style task management application built with **React**, **TypeScript**, and **Tailwind CSS**. This dashboard features a fully functional drag-and-drop workflow simulation, complex filtering, real-time analytics, and local persistence.
 
-![Project Screenshot](assets/ss.png)
+![Project Screenshot](https://github.com/manan10/jira-lite/blob/main/src/assets/ss.png?raw=true)
 
 ## 🚀 Features
 
