@@ -2,7 +2,7 @@
 
 A robust, Kanban-style task management application built with **React**, **TypeScript**, and **Tailwind CSS**. This dashboard features a fully functional drag-and-drop workflow simulation, complex filtering, real-time analytics, and local persistence.
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=Dashboard+Screenshot+Placeholder)
+![Project Screenshot](assets/ss.png)
 
 ## 🚀 Features
 
