@@ -51,6 +51,7 @@ export const Dashboard = () => {
             boardColumns.map(column => {
                 return (
                     <TaskColumn
+                        key={column.status}
                         title={column.title}
                         status={column.status}
                         color={column.color}

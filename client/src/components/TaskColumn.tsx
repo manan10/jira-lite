@@ -26,7 +26,6 @@ export const TaskColumn = ({
     green: "text-green-500 bg-green-100 text-green-600",
   };
 
-  // Extract just the text color part for the title, and badge part for the count
   const titleColor = colorMap[color].split(" ")[0];
   const badgeColor = colorMap[color].split(" ").slice(1).join(" ");
 
