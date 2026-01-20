@@ -41,3 +41,4 @@ export const nextStatus = {
   [Status.InReview]: Status.Done,
   [Status.Done]: null,
 };
+
