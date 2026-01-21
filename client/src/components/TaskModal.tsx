@@ -1,35 +1,80 @@
-import type { Task } from "../types/types";
+// src/components/TaskModal.tsx
+import React, { useState } from "react"; // removed useEffect
+import { X } from "lucide-react";
+import { type Task } from "../types/types";
 
 interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  initialData: Task | undefined;
+  onSubmit: (taskData: Omit<Task, "id">) => Promise<void> | void;
+  initialData?: Task | null;
 }
 
 export const TaskModal = ({
-  isOpen,
   onClose,
   onSubmit,
   initialData,
 }: TaskModalProps) => {
-  if (!isOpen) return null;
+  // FIX: Initialize state directly from props.
+  // Since the parent now unmounts this component when closed,
+  // this line runs fresh every time the modal opens.
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [priority, setPriority] = useState<Task["priority"]>(
+    initialData?.priority || "P1",
+  );
+  const [status, setStatus] = useState<Task["status"]>(
+    initialData?.status || "Todo",
+  );
+  // Handle date parsing safely
+  const [deadline, setDeadline] = useState(
+    initialData?.deadline ? initialData.deadline.split("T")[0] : "",
+  );
+
+  // DELETE: The entire useEffect block is gone! 🗑️
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      title,
+      priority,
+      status,
+      deadline,
+    });
+  };
+
+  // DELETE: "if (!isOpen) return null" is no longer needed
+  // because the parent handles the hiding.
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
-        <h2 className="text-xl font-bold mb-4">Manage Task</h2>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h2 className="text-xl font-bold text-slate-800">
+            {initialData ? "Edit Task" : "New Task"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-full transition"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        <form onSubmit={onSubmit} className="space-y-4">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Title
+              Task Title
             </label>
             <input
-              name="title"
-              defaultValue={initialData?.title}
-              className="w-full border border-slate-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="What needs to be done?"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               required
+              autoFocus
             />
           </div>
 
@@ -39,42 +84,61 @@ export const TaskModal = ({
                 Priority
               </label>
               <select
-                defaultValue={initialData?.priority}
-                name="priority"
-                className="w-full border border-slate-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                value={priority}
+                onChange={(e) =>
+                  setPriority(e.target.value as Task["priority"])
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
-                <option value="P0">P0 - High</option>
-                <option value="P1">P1 - Medium</option>
-                <option value="P2">P2 - Low</option>
+                <option value="P0">P0 (High)</option>
+                <option value="P1">P1 (Medium)</option>
+                <option value="P2">P2 (Low)</option>
               </select>
             </div>
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Deadline
+                Status
               </label>
-              <input
-                defaultValue={initialData?.deadline}
-                name="deadline"
-                type="date"
-                className="w-full border border-slate-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-                required
-              />
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as Task["status"])}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value="Todo">To Do</option>
+                <option value="InProgress">In Progress</option>
+                <option value="InReview">In Review</option>
+                <option value="Done">Done</option>
+              </select>
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Deadline
+            </label>
+            <input
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 mt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-300 rounded hover:bg-slate-50 text-slate-700 font-medium"
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold shadow-sm"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm hover:shadow transition"
             >
-              Save
+              {initialData ? "Save Changes" : "Create Task"}
             </button>
           </div>
         </form>

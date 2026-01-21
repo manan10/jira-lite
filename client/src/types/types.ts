@@ -1,5 +1,5 @@
 export interface Task {
-  id: number;
+  id: string;
   title: string;
   priority: Priority;
   status: Status;
@@ -41,4 +41,3 @@ export const nextStatus = {
   [Status.InReview]: Status.Done,
   [Status.Done]: null,
 };
-

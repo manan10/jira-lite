@@ -3,12 +3,12 @@ import { TaskCard } from "./TaskCard";
 
 interface TaskColumnProps {
   title: string;
-  tasks: Task[]; 
-  status: string; 
+  tasks: Task[];
+  status: string;
   color: "slate" | "blue" | "orange" | "green";
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
-  onMove: (id: number, direction: "left" | "right") => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onMove: (id: string, direction: "left" | "right") => void;
 }
 
 export const TaskColumn = ({

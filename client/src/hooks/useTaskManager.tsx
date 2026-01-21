@@ -1,177 +1,78 @@
-import { useState, useEffect, useMemo } from "react";
-import {
-  Status,
-  Priority,
-  previousStatus,
-  nextStatus,
-  type Task,
-} from "../types/types"; 
+import { useTasksData } from './useTasksData';
+import { useTaskFilters } from './useTaskFilters';
+import { useTaskModal } from './useTaskModal';
+import { type Task } from '../types/types';
 
 export const useTaskManager = () => {
-  const checkForLocalTasks = () => {
-    const data = localStorage.getItem("tasks");
-    if (!data) return [];
-    const localData = JSON.parse(data) as Task[];
-    return localData;
-  };
+  // 1. Data Layer (API, Loading, Error, Audit Logs)
+  const { tasks, isLoading, error, auditLogs, addTask, updateTask, deleteTask } = useTasksData();
+  
+  // 2. Filter Layer (Search & Priority)
+  const { filteredTasks, searchQuery, setSearchQuery, priorityFilter, setPriorityFilter } 
+    = useTaskFilters(tasks);
 
-  const checkForLocalLogs = () => {
-    const data = localStorage.getItem("logs");
-    if (!data) return [];
-    const localData = JSON.parse(data) as string[];
-    return localData;
-  };
+  // 3. UI Layer (Modal State)
+  const modal = useTaskModal();
 
-  const [tasks, setTasks] = useState<Task[]>(checkForLocalTasks);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [auditLogs, setAuditLogs] = useState<string[]>(checkForLocalLogs);
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("All");
-
-  const editingTask = tasks.find((t) => t.id === editingId);
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
-      const matchesSearch = task.title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchesPriority =
-        priorityFilter === "All" || task.priority === priorityFilter;
-      return matchesSearch && matchesPriority;
-    });
-  }, [tasks, searchQuery, priorityFilter]);
-
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  useEffect(() => {
-    localStorage.setItem("logs", JSON.stringify(auditLogs));
-  }, [auditLogs]);
-
-  const today = new Date().toISOString().split("T")[0];
-  const taskCounts = tasks.reduce(
-    (acc, task) => {
-      const key = task.status;
-      if (!acc[key]) acc[key] = 0;
-      if (!acc["OverDue"]) acc["OverDue"] = 0;
-      if (!acc["Total"]) acc["Total"] = 0;
-
-      acc[key] += 1;
-      if (task.deadline < today) acc["OverDue"] += 1;
-      acc["Total"] += 1;
-      return acc;
-    },
-    {} as Record<Status | "OverDue" | "Total", number>,
-  );
-
-  const newTaskClick = () => {
-    setEditingId(null);
-    setIsModalOpen(true);
-  };
-
-  const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries()) as unknown as Task;
-
-    setTasks((prevTasks) => {
-      if (editingId) {
-        return prevTasks.map((task) =>
-          task.id !== editingId
-            ? task
-            : {
-                ...task,
-                title: data.title,
-                priority: data.priority,
-                deadline: data.deadline,
-              },
-        );
-      } else {
-        return [
-          ...prevTasks,
-          {
-            id: Date.now() * 1000 + Math.floor(Math.random() * 1000),
-            status: Status.Todo,
-            title: data.title,
-            priority: data.priority,
-            deadline: data.deadline,
-          },
-        ];
-      }
-    });
-
-    if (!editingId) {
-      setAuditLogs((prevLogs) => [
-        `New task ${data.title} created`,
-        ...prevLogs,
-      ]);
+  // 4. Interaction Handlers (Wiring UI to Data)
+  const handleSaveTask = async (taskData: Omit<Task, 'id'>) => {
+    if (modal.editingTask) {
+      await updateTask(modal.editingTask.id, taskData);
+    } else {
+      await addTask(taskData);
     }
-
-    setIsModalOpen(false);
-    setEditingId(null);
+    modal.closeModal();
   };
 
-  const handleEdit = (id: number) => {
-    setEditingId(id);
-    setIsModalOpen(true);
-  };
+  const handleMoveTask = (id: string, direction: 'left' | 'right') => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    
+    const statusOrder = ['Todo', 'InProgress', 'InReview', 'Done'];
+    const currentIndex = statusOrder.indexOf(task.status);
+    const newIndex = direction === 'right' ? currentIndex + 1 : currentIndex - 1;
 
-  const handleMove = (id: number, direction: "left" | "right") => {
-    const taskToBeMoved = tasks.find((task) => task.id === id);
-    if (!taskToBeMoved) {
-      alert("Something went wrong");
-      return;
+    if (newIndex >= 0 && newIndex < statusOrder.length) {
+      const newStatus = statusOrder[newIndex] as Task['status'];
+      updateTask(id, { status: newStatus });
     }
-
-    const targetStatus =
-      direction === "left"
-        ? previousStatus[taskToBeMoved?.status]
-        : nextStatus[taskToBeMoved?.status];
-
-    if (!targetStatus) return;
-    if (
-      targetStatus === Status.Done &&
-      taskToBeMoved.priority === Priority.P2
-    ) {
-      alert("Can't move Low Priority Tasks to Done.");
-      return;
-    }
-
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskToBeMoved.id ? { ...task, status: targetStatus } : task,
-      ),
-    );
-
-    setAuditLogs((prevLogs) => [
-      `Task ${taskToBeMoved.title} moved to ${targetStatus}`,
-      ...prevLogs,
-    ]);
   };
 
-  const handleDeleteTask = (id: number) => {
-    const taskTitle = tasks.find((task) => task.id === id)?.title;
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-    setAuditLogs((prevLogs) => [`Task ${taskTitle} deleted`, ...prevLogs]);
-  };
-
+  // 5. Return Everything
   return {
     tasks: filteredTasks,
-    stats: taskCounts,
-    auditLogs: auditLogs,
-    isModalOpen: isModalOpen,
-    openModalForAdd: newTaskClick,
-    openModalForEdit: (id: number) => handleEdit(id),
-    closeModal: () => setIsModalOpen(false),
-    handleSaveTask: handleAddTask,
-    handleMoveTask: handleMove,
-    handleDeleteTask,
-    searchQuery,
-    setSearchQuery,
-    priorityFilter,
-    setPriorityFilter,
-    editingTask,
+    
+    // FIX: Capitalized keys to match StatsBar component
+    stats: {
+      Todo: tasks.filter(t => t.status === 'Todo').length,
+      InProgress: tasks.filter(t => t.status === 'InProgress').length,
+      InReview: tasks.filter(t => t.status === 'InReview').length,
+      Done: tasks.filter(t => t.status === 'Done').length,
+      Total: tasks.length,
+      OverDue: tasks.filter(t => new Date(t.deadline) < new Date() && t.status !== 'Done').length
+    },
+
+    auditLogs,
+    isLoading,
+    error,
+
+    // Filter Props
+    searchQuery, setSearchQuery,
+    priorityFilter, setPriorityFilter,
+
+    // Modal Props
+    isModalOpen: modal.isModalOpen,
+    editingTask: modal.editingTask,
+    openModalForAdd: modal.openForAdd,
+    openModalForEdit: (id: string) => {
+      const t = tasks.find(task => task.id === id);
+      if (t) modal.openForEdit(t);
+    },
+    closeModal: modal.closeModal,
+
+    // Actions
+    handleSaveTask,
+    handleDeleteTask: deleteTask,
+    handleMoveTask
   };
 };

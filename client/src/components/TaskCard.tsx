@@ -3,9 +3,9 @@ import type { Task } from "../types/types";
 
 interface TaskCardProps {
   task: Task; 
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
-  onMove: (id: number, direction: "left" | "right") => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onMove: (id: string, direction: "left" | "right") => void;
 }
 
 export const TaskCard = ({ task, onEdit, onDelete, onMove }: TaskCardProps) => {

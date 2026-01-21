@@ -1,4 +1,4 @@
-import { CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import { TaskColumn } from "../components/TaskColumn";
 import { TaskModal } from "../components/TaskModal";
 import { useTaskManager } from "../hooks/useTaskManager";
@@ -24,7 +24,34 @@ export const Dashboard = () => {
     handleDeleteTask,
     handleMoveTask,
     editingTask,
+    isLoading,
+    error,
   } = useTaskManager();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+        <Loader2 className="animate-spin mb-4 text-blue-600" size={48} />
+        <p className="font-medium">Loading your workspace...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-red-50 text-red-600">
+        <AlertCircle size={48} className="mb-4" />
+        <h2 className="text-2xl font-bold mb-2">Connection Error</h2>
+        <p className="mb-6">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
+        >
+          Retry Connection
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans text-slate-900">
@@ -47,32 +74,34 @@ export const Dashboard = () => {
         />
 
         <div className="grid grid-cols-4 gap-6 h-[calc(100vh-300px)]">
-        {
-            boardColumns.map(column => {
-                return (
-                    <TaskColumn
-                        key={column.status}
-                        title={column.title}
-                        status={column.status}
-                        color={column.color}
-                        tasks={filteredTasks.filter((t) => t.status === column.status)}
-                        onEdit={(id) => openModalForEdit(id)}
-                        onDelete={(id) => handleDeleteTask(id)}
-                        onMove={(id, direction) => handleMoveTask(id, direction)}
-                    />
-                );
-            })              
-        }                  
+          {boardColumns.map((column) => {
+            return (
+              <TaskColumn
+                key={column.status}
+                title={column.title}
+                status={column.status}
+                color={column.color}
+                tasks={filteredTasks.filter((t) => t.status === column.status)}
+                onEdit={(id) => openModalForEdit(id)}
+                onDelete={(id) => handleDeleteTask(id)}
+                onMove={(id, direction) => handleMoveTask(id, direction)}
+              />
+            );
+          })}
         </div>
       </main>
 
       <AuditLogFooter logs={auditLogs} />
-      <TaskModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSubmit={handleSaveTask}
-        initialData={editingTask}
-      />
+
+      {isModalOpen && (
+        <TaskModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onSubmit={handleSaveTask}
+          initialData={editingTask}
+          key={editingTask ? editingTask.id : "create-new"}
+        />
+      )}
     </div>
   );
 };
