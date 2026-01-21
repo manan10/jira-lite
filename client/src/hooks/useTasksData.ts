@@ -8,7 +8,6 @@ export const useTasksData = () => {
   const [error, setError] = useState<string | null>(null);
   const [auditLogs, setAuditLogs] = useState<string[]>([]);
 
-  // Log Helper
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setAuditLogs(prev => [`[${timestamp}] ${message}`, ...prev].slice(0, 5));
@@ -37,17 +36,14 @@ export const useTasksData = () => {
   };
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
-    // Optimistic Update
     const previousTasks = [...tasks];
     setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
 
     try {
       const updated = await taskService.update(id, updates);
-      // Confirm with server data
       setTasks(prev => prev.map(t => t.id === id ? updated : t));
       if (updates.status) addLog(`Moved to ${updates.status}`);
     } catch {
-      // Rollback
       setTasks(previousTasks);
       alert('Failed to update task');
     }

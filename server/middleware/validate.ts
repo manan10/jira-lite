@@ -3,7 +3,6 @@ import { AnyZodObject, ZodError } from 'zod';
 
 export const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Validates req.body, req.query, and req.params
     schema.parse({
       body: req.body,
       query: req.query,

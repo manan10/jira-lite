@@ -1,5 +1,4 @@
-// src/components/TaskModal.tsx
-import React, { useState } from "react"; // removed useEffect
+import React, { useState } from "react";
 import { X } from "lucide-react";
 import { type Task } from "../types/types";
 
@@ -15,9 +14,6 @@ export const TaskModal = ({
   onSubmit,
   initialData,
 }: TaskModalProps) => {
-  // FIX: Initialize state directly from props.
-  // Since the parent now unmounts this component when closed,
-  // this line runs fresh every time the modal opens.
   const [title, setTitle] = useState(initialData?.title || "");
   const [priority, setPriority] = useState<Task["priority"]>(
     initialData?.priority || "P1",
@@ -25,12 +21,10 @@ export const TaskModal = ({
   const [status, setStatus] = useState<Task["status"]>(
     initialData?.status || "Todo",
   );
-  // Handle date parsing safely
+
   const [deadline, setDeadline] = useState(
     initialData?.deadline ? initialData.deadline.split("T")[0] : "",
   );
-
-  // DELETE: The entire useEffect block is gone! 🗑️
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +36,9 @@ export const TaskModal = ({
     });
   };
 
-  // DELETE: "if (!isOpen) return null" is no longer needed
-  // because the parent handles the hiding.
-
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <h2 className="text-xl font-bold text-slate-800">
             {initialData ? "Edit Task" : "New Task"}
@@ -61,7 +51,6 @@ export const TaskModal = ({
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">

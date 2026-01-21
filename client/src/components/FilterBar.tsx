@@ -1,4 +1,3 @@
-// src/components/FilterBar.tsx
 import { Plus, Search } from 'lucide-react';
 
 interface FilterBarProps {

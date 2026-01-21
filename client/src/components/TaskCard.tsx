@@ -1,6 +1,5 @@
 import { Edit2, Trash2, ChevronRight, ChevronLeft } from "lucide-react";
 import type { Task } from "../types/types";
-
 interface TaskCardProps {
   task: Task; 
   onEdit: (id: string) => void;
@@ -11,7 +10,6 @@ interface TaskCardProps {
 export const TaskCard = ({ task, onEdit, onDelete, onMove }: TaskCardProps) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow group relative">
-      {/* HEADER: Priority & Actions */}
       <div className="flex justify-between items-start mb-2">
         <span
           className={`text-xs px-2 py-0.5 rounded font-bold border 
@@ -41,7 +39,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onMove }: TaskCardProps) => {
         </div>
       </div>
 
-      {/* BODY */}
       <h3 className="font-semibold text-slate-800 mb-1 leading-tight">
         {task.title}
       </h3>
@@ -51,7 +48,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onMove }: TaskCardProps) => {
         {task.deadline}
       </p>
 
-      {/* FOOTER: Move Controls */}
       <div className="flex justify-between pt-2 border-t border-slate-50">
         <button
           onClick={() => onMove(task.id, "left")}

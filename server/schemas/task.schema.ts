@@ -11,7 +11,6 @@ export const createTaskSchema = z.object({
   })
 });
 
-// For updates, fields are optional, but if provided, must be valid
 export const updateTaskSchema = z.object({
   body: z.object({
     title: z.string().min(1).optional(),
@@ -21,5 +20,4 @@ export const updateTaskSchema = z.object({
   })
 });
 
-// Extract the Type for use in Controllers (Bonus TS feature!)
 export type CreateTaskInput = z.infer<typeof createTaskSchema>['body'];
