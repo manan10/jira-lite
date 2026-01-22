@@ -1,6 +1,8 @@
 import { useTasksData } from "./useTasksData";
 import { useTaskFilters } from "./useTaskFilters";
 import { useTaskModal } from "./useTaskModal";
+import { useTaskDragAndDrop } from "./useTaskDragAndDrop";
+
 import { type Task } from "../types/types";
 
 export const useTaskManager = () => {
@@ -20,7 +22,11 @@ export const useTaskManager = () => {
     priorityFilter,
     setPriorityFilter,
   } = useTaskFilters(tasks);
+
   const modal = useTaskModal();
+  // 4. Interaction Layer (Drag & Drop) 👇
+  // We pass the RAW 'tasks' list here, not filteredTasks, to ensure we look up IDs correctly
+  const { onDragEnd } = useTaskDragAndDrop({ tasks, updateTask });
 
   const handleSaveTask = async (taskData: Omit<Task, "id">) => {
     if (modal.editingTask) {
@@ -76,5 +82,6 @@ export const useTaskManager = () => {
     handleSaveTask,
     handleDeleteTask: deleteTask,
     handleMoveTask,
+    onDragEnd,
   };
 };
