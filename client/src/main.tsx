@@ -1,19 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { Provider } from 'react-redux'; 
+
 import App from "./App.tsx";
 import "./index.css";
 import { ThemeProvider } from "./context/ThemeContext";
-import { BrowserRouter } from "react-router-dom";
 import { ToastProvider } from "./context/ToastContext.tsx";
+import { store } from './store/store';
+
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <ThemeProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 );

@@ -1,6 +1,17 @@
-import { Link } from "react-router-dom"; // <--- Import Link
-import { AlertCircle, CheckCircle, Loader2, Moon, Sun, Home } from "lucide-react"; // <--- Import Home Icon
-import { useTheme } from '../context/ThemeContext'; 
+import { Link } from "react-router-dom";
+import {
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  Moon,
+  Sun,
+  LogOut,
+  User as UserIcon,
+} from "lucide-react"; // <--- Added Icons
+
+import { useTheme } from "../context/ThemeContext";
+import { useAppDispatch, useAppSelector } from "../store/hooks"; // <--- Added Hooks
+import { logout } from "../store/authSlice"; // <--- Added Action
 
 import { TaskColumn } from "../components/TaskColumn";
 import { TaskModal } from "../components/TaskModal";
@@ -13,7 +24,11 @@ import { DragDropContext } from "@hello-pangea/dnd";
 
 export const Dashboard = () => {
   const { theme, toggleTheme } = useTheme();
-  
+  const dispatch = useAppDispatch(); // <--- Init Dispatch
+
+  // Get User Info from Redux
+  const { user } = useAppSelector((state) => state.auth);
+
   const {
     tasks: filteredTasks,
     stats,
@@ -31,8 +46,16 @@ export const Dashboard = () => {
     editingTask,
     isLoading,
     error,
-    onDragEnd
+    onDragEnd,
   } = useTaskManager();
+
+  // Handle Logout
+  const handleLogout = () => {
+    dispatch(logout());
+    // No need to navigate() manually;
+    // The ProtectedRoute wrapper will detect 'isAuthenticated: false'
+    // and kick us to /login automatically.
+  };
 
   if (isLoading) {
     return (
@@ -61,32 +84,46 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      {/* HEADER */}
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <Link 
-              to="/" 
+            {/* Logo */}
+            <Link
+              to="/"
               className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white hover:opacity-80 transition-opacity"
-              title="Back to Home"
             >
-              <CheckCircle className="text-blue-600" /> Jira-Lite Dashboard
+              <CheckCircle className="text-blue-600" /> Jira-Lite
             </Link>
 
-            <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
-                title="Go to Home"
-              >
-                <Home size={24} />
-              </Link>
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-4">
+              {/* User Profile Badge */}
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 rounded-full border border-slate-200 dark:border-slate-600">
+                <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <UserIcon size={14} />
+                </div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  {user?.name || "Guest"}
+                </span>
+              </div>
 
+              {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
                 title="Toggle Theme"
               >
-                {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
+                {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+              </button>
+
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                title="Logout"
+              >
+                <LogOut size={20} />
               </button>
             </div>
           </div>
@@ -113,7 +150,9 @@ export const Dashboard = () => {
                   title={column.title}
                   status={column.status}
                   color={column.color}
-                  tasks={filteredTasks.filter((t) => t.status === column.status)}
+                  tasks={filteredTasks.filter(
+                    (t) => t.status === column.status,
+                  )}
                   onEdit={(id) => openModalForEdit(id)}
                   onDelete={(id) => handleDeleteTask(id)}
                 />

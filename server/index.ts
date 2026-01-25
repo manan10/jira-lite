@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 
 import taskRoutes from "./routes/taskRoutes";
+import authRoutes from "./routes/authRoutes";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ mongoose
   .catch((err: Error) => console.error("❌ MongoDB Connection Error:", err));
 
 app.use("/api/tasks", taskRoutes);
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

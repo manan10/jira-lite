@@ -8,7 +8,6 @@ const api = axios.create({
   },
 });
 
-
 export const taskService = {
   fetchAll: async (): Promise<Task[]> => {
     const response = await api.get<Task[]>('/tasks');
