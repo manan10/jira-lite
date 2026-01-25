@@ -7,12 +7,13 @@ import {
 } from "../controllers/taskController";
 import { validate } from "../middleware/validate";
 import { createTaskSchema, updateTaskSchema } from "../schemas/task.schema";
+import { protect } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.get("/", getTasks);
-router.post("/", validate(createTaskSchema), createTask);
-router.put("/:id", validate(updateTaskSchema), updateTask);
-router.delete("/:id", deleteTask);
+router.get("/", protect, getTasks);
+router.post("/", protect, validate(createTaskSchema), createTask);
+router.put("/:id", protect, validate(updateTaskSchema), updateTask);
+router.delete("/:id", protect, deleteTask);
 
 export default router;
