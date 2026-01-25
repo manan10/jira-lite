@@ -8,18 +8,21 @@ import "./index.css";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext.tsx";
 import { store } from './store/store';
+import { ErrorBoundary } from "./components/ErrorBoundry.tsx";
 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <ThemeProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </ThemeProvider>
-      </BrowserRouter>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <ThemeProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
     </Provider>
   </React.StrictMode>,
 );

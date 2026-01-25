@@ -49,12 +49,8 @@ export const Dashboard = () => {
     onDragEnd,
   } = useTaskManager();
 
-  // Handle Logout
   const handleLogout = () => {
     dispatch(logout());
-    // No need to navigate() manually;
-    // The ProtectedRoute wrapper will detect 'isAuthenticated: false'
-    // and kick us to /login automatically.
   };
 
   if (isLoading) {
@@ -84,11 +80,9 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      {/* HEADER */}
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            {/* Logo */}
             <Link
               to="/"
               className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white hover:opacity-80 transition-opacity"
@@ -96,9 +90,7 @@ export const Dashboard = () => {
               <CheckCircle className="text-blue-600" /> Jira-Lite
             </Link>
 
-            {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-              {/* User Profile Badge */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 rounded-full border border-slate-200 dark:border-slate-600">
                 <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
                   <UserIcon size={14} />
@@ -108,7 +100,6 @@ export const Dashboard = () => {
                 </span>
               </div>
 
-              {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
@@ -117,7 +108,6 @@ export const Dashboard = () => {
                 {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
               </button>
 
-              {/* Logout Button */}
               <button
                 onClick={handleLogout}
                 className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
@@ -168,7 +158,12 @@ export const Dashboard = () => {
         <TaskModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          onSubmit={handleSaveTask}
+          onSubmit={(formData) => {
+            handleSaveTask({
+              ...formData,
+              status: editingTask ? editingTask.status : 'Todo', 
+            });
+          }}
           initialData={editingTask}
           key={editingTask ? editingTask.id : "create-new"}
         />

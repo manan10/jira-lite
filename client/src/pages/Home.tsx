@@ -6,7 +6,6 @@ import { FeatureRow } from '../components/FeatureRow';
 
 export const Home = () => {
   const { user } = useAppSelector((state) => state.auth);
-  
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }

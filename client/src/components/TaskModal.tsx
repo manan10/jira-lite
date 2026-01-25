@@ -1,69 +1,65 @@
-import React, { useState } from "react";
-import { X } from "lucide-react";
-import { type Task } from "../types/types";
+import { useState } from "react";
+import { createPortal } from "react-dom";
+import { X, Calendar, AlertCircle } from "lucide-react";
+import { type Task, Priority } from "../types/types";
 
 interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (taskData: Omit<Task, "id">) => Promise<void> | void;
+  onSubmit: (task: { title: string; priority: Priority; deadline: string }) => void;
   initialData?: Task | null;
 }
 
-export const TaskModal = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  initialData,
-}: TaskModalProps) => {
+export const TaskModal = ({ isOpen, onClose, onSubmit, initialData }: TaskModalProps) => {
+  // ✅ FIX: Initialize state directly from props.
+  // Because we use a 'key' in the parent, this runs fresh every time the modal opens.
   const [title, setTitle] = useState(initialData?.title || "");
-  const [priority, setPriority] = useState<Task["priority"]>(
-    initialData?.priority || "P1",
-  );
-  const [status, setStatus] = useState<Task["status"]>(
-    initialData?.status || "Todo",
-  );
-  const [deadline, setDeadline] = useState(
-    initialData?.deadline ? initialData.deadline.split("T")[0] : "",
-  );
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      title,
-      priority,
-      status,
-      deadline,
-    });
-  };
+  const [priority, setPriority] = useState<Priority>(initialData?.priority || "P1");
+  const [deadline, setDeadline] = useState(initialData?.deadline || "");
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
-          <h2 className="text-xl font-bold text-slate-800 dark:text-white">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Modal Content */}
+      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        
+        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             {initialData ? "Edit Task" : "New Task"}
           </h2>
-          <button
+          <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 p-1 rounded-full transition"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
           >
-            <X size={20} />
+            <X size={20} className="text-slate-500" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form 
+            onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit({ title, priority, deadline });
+                onClose();
+            }}
+            className="p-6 space-y-6"
+        >
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Task Title
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Task Title
             </label>
             <input
               type="text"
+              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors dark:text-white"
+              placeholder="e.g., Redesign Homepage"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What needs to be done?"
-              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
               required
               autoFocus
             />
@@ -71,69 +67,58 @@ export const TaskModal = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Priority
-              </label>
-              <select
-                value={priority}
-                onChange={(e) =>
-                  setPriority(e.target.value as Task["priority"])
-                }
-                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              >
-                <option value="P0">P0 (High)</option>
-                <option value="P1">P1 (Medium)</option>
-                <option value="P2">P2 (Low)</option>
-              </select>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Priority
+                </label>
+                <div className="relative">
+                    <AlertCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <select
+                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer dark:text-white"
+                        value={priority}
+                        onChange={(e) => setPriority(e.target.value as Priority)}
+                    >
+                        <option value="P2">Low</option>
+                        <option value="P1">Medium</option>
+                        <option value="P0">High</option>
+                    </select>
+                </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Status
-              </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as Task["status"])}
-                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              >
-                <option value="Todo">To Do</option>
-                <option value="InProgress">In Progress</option>
-                <option value="InReview">In Review</option>
-                <option value="Done">Done</option>
-              </select>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Deadline
+                </label>
+                <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <input
+                        type="date"
+                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:text-white"
+                        value={deadline}
+                        onChange={(e) => setDeadline(e.target.value)}
+                        required
+                    />
+                </div>
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Deadline
-            </label>
-            <input
-              type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              required
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4 mt-2 border-t border-slate-100 dark:border-slate-700">
+          <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm hover:shadow transition-all"
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95"
             >
               {initialData ? "Save Changes" : "Create Task"}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
