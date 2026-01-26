@@ -9,4 +9,8 @@ export const createTaskSchema = z.object({
   }),
 });
 
+export const updateTaskSchema = z.object({
+  body: createTaskSchema.shape.body.partial(),
+});
+
 export type CreateTaskInput = z.infer<typeof createTaskSchema>['body'];
