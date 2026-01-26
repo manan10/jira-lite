@@ -41,3 +41,16 @@ export const nextStatus = {
   [Status.InReview]: Status.Done,
   [Status.Done]: null,
 };
+
+export interface UserSummary {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+export interface Comment {
+  _id: string;
+  content: string;
+  user: UserSummary;
+  createdAt: string;
+}

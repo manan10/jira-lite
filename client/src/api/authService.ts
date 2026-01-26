@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "./api";
 export interface User {
   id: string;
   name: string;
@@ -25,18 +25,9 @@ export interface LoginData {
   password: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-
-const api = axios.create({
-  baseURL: API_URL + "/auth",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
 export const authService = {
   register: async (userData: RegisterData): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>("/register", userData);
+    const response = await api.post<AuthResponse>("/auth/register", userData);
 
     if (response.data) {
       localStorage.setItem("user", JSON.stringify(response.data));
@@ -46,7 +37,7 @@ export const authService = {
   },
 
   login: async (userData: LoginData): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>("/login", userData);
+    const response = await api.post<AuthResponse>("/auth/login", userData);
 
     if (response.data) {
       localStorage.setItem("user", JSON.stringify(response.data));

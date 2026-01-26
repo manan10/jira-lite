@@ -3,6 +3,8 @@ import { createPortal } from "react-dom";
 import { X, Calendar, AlertCircle } from "lucide-react";
 import { type Task, Priority } from "../types/types";
 
+import { CommentsSection } from './CommentSection'; 
+
 interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -116,6 +118,10 @@ export const TaskModal = ({ isOpen, onClose, onSubmit, initialData }: TaskModalP
               {initialData ? "Save Changes" : "Create Task"}
             </button>
           </div>
+
+          {initialData && initialData.id && (
+            <CommentsSection taskId={initialData.id} />
+          )}
         </form>
       </div>
     </div>,

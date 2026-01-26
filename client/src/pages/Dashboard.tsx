@@ -26,7 +26,6 @@ export const Dashboard = () => {
   const { theme, toggleTheme } = useTheme();
   const dispatch = useAppDispatch(); // <--- Init Dispatch
 
-  // Get User Info from Redux
   const { user } = useAppSelector((state) => state.auth);
 
   const {

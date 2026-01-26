@@ -11,6 +11,7 @@ interface DecodedToken extends jwt.JwtPayload {
 }
 
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  console.log("Protect: ", req.body);
   let token;
 
   if (
