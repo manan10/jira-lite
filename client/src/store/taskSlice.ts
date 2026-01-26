@@ -2,9 +2,6 @@ import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/tool
 import { type Task } from '../types/types';
 import { taskService } from '../api/api';
 
-// 1. Define the "Shape" of your global state
-// This replaces: const [tasks, setTasks] = useState([])
-// This replaces: const [isLoading, setIsLoading] = useState(false)
 interface TasksState {
   items: Task[];
   isLoading: boolean;
@@ -18,10 +15,6 @@ const initialState: TasksState = {
   error: null,
   auditLogs: [],
 };
-
-// 2. Create Async Thunks (The API Logic)
-// These replace your functions like 'fetchTasks' inside the hook.
-// Redux handles the try/catch/finally logic automatically.
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const response = await taskService.fetchAll();
@@ -51,6 +44,13 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
+    updateTaskOptimistic: (state, action: PayloadAction<{ id: string; status: Task['status'] }>) => {
+      const { id, status } = action.payload;
+      const task = state.items.find((t) => t.id === id);
+      if (task) {
+        task.status = status; // Update immediately!
+      }
+    },
     // Synchronous actions (things that happen instantly without an API)
     addAuditLog: (state, action: PayloadAction<string>) => {
       const timestamp = new Date().toLocaleTimeString();
@@ -103,5 +103,5 @@ const tasksSlice = createSlice({
   },
 });
 
-export const { addAuditLog, clearError } = tasksSlice.actions;
+export const { addAuditLog, clearError, updateTaskOptimistic } = tasksSlice.actions;
 export default tasksSlice.reducer;

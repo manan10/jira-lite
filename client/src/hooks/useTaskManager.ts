@@ -24,7 +24,7 @@ export const useTaskManager = () => {
   } = useTaskFilters(tasks);
 
   const modal = useTaskModal();
-  const { onDragEnd } = useTaskDragAndDrop({ tasks, updateTask });
+  const { onDragEnd } = useTaskDragAndDrop({ updateTask });
 
   const handleSaveTask = async (taskData: Omit<Task, "id">) => {
     if (modal.editingTask) {
