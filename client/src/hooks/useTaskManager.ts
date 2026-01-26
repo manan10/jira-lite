@@ -24,8 +24,6 @@ export const useTaskManager = () => {
   } = useTaskFilters(tasks);
 
   const modal = useTaskModal();
-  // 4. Interaction Layer (Drag & Drop) 👇
-  // We pass the RAW 'tasks' list here, not filteredTasks, to ensure we look up IDs correctly
   const { onDragEnd } = useTaskDragAndDrop({ tasks, updateTask });
 
   const handleSaveTask = async (taskData: Omit<Task, "id">) => {

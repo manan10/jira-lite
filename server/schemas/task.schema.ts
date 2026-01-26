@@ -5,7 +5,7 @@ export const createTaskSchema = z.object({
     title: z.string().min(1, "Title is required"),
     priority: z.enum(["P0", "P1", "P2"]),
     deadline: z.string().min(1, "Deadline is required"),
-    status: z.enum(["Todo", "In Progress", "Done"]).optional(),
+    status: z.enum(["Todo", "InProgress", "InReview", "Done"]).optional(),
   }),
 });
 

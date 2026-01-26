@@ -15,7 +15,7 @@ export const Priority = {
 export const Status = {
   Todo: "Todo",
   InProgress: "InProgress",
-  InReview: "InReview", // Fixed typo
+  InReview: "InReview", 
   Done: "Done",
 } as const;
 
